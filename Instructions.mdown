@@ -1,0 +1,40 @@
+# Projet
+
+Il va falloir proposer à un client une option avec un module GSM. 
+Tu transmet des SMS lorsque tu as un état bas ou haut sur une entrée de l’arduino par exemple.
+
+## Instructions
+
+1er projet : on reçoit une notification de défaut système. Ex. : 
+
+- une batterie est déchargée
+- un piston qui est en vrille
+- un tube UV a lâché
+
+Ensuite, le défaut est remonté sur l'arduino, et en fonction de :
+
+- son origine
+- sa gravité
+
+On envoie un message sur un numéro de téléphone du type : 
+
+> "Attention, réf. XXX, erreur YYY"
+
+## Matériel à utiliser
+
+Arduino de base (voir sinon la Méga si on a besoin de plus de pins)
+
+## Optionnel
+
+Il serait bien de pouvoir :
+
+1. Envoyer un message pour commander une lecture d'état de tubes UV (cet état est une constante définie lors de la mise en route de l'utilisation du tube UV, et qui effectue un décompte des heures d'utilisation via un Arduino)
+2. Un texto pourrait être renvoyé avec le nb d'heures restantes.
+
+De plus, le système pourrait envoyer un message toutes les 1000 heures d'utilisations, du type : 
+
+> "Machine X, tube UV n°Y : Reste Z heures d'utilisation"
+
+### Encore plus optionnel 
+
+Peut envoyer ces messages sur internet, pour ensuite créer une sorte de page récapitulative ? Ou alors via Filemaker ? Est-ce compliqué ?
