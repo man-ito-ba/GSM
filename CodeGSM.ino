@@ -110,6 +110,8 @@ void Reception(){
 
 	// Si un SMS est reçu()
 	if (sms.available()) {
+		Seria.println("Message en cours de reception...");
+		delay(1000);
 		Serial.println("Expediteur du SMS :");
 		// Obtention et affichage du numéro de l'expéditeur du SMS
 		sms.remoteNumber(Num_ExpediteurSMS, 20);
