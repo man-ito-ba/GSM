@@ -17,8 +17,9 @@ void setup()
 	while (!Serial) {
 		; // On attend que le port Serial se connecte, ce qui est surtout indispensable seulement pour le port USB natif
 	}
-
-	Serial.println("** Programm SMS in/out **");
+	Serial.println("**************************");
+	Serial.println("** Programme SMS in/out **");
+	Serial.println("**************************");
 
 	// Bool d'état de la connection
 	bool notConnected = true;
@@ -26,18 +27,19 @@ void setup()
 	// Démarrage du shield GSM
 	// Si la SIM a un code PIN, le passer en tant que paramètre de begin(), entre guillemets
 	while (notConnected) {
-		Serial.println("--Recherche du reseau...");
+		Serial.println("-- Recherche du reseau...");
 		if (gsmAccess.begin(CodePIN) == GSM_READY) {
 			notConnected = false;
 		} 
 		else {
-			Serial.println("--Pas de connection");
+			Serial.println("-- Pas de connection");
 			delay(1000);
 		}
 	}
 
-	Serial.println("--En fonction");
-	Instructions();
+	Serial.println("-- En fonction");
+
+	Reception();										// Avant de commencer le programme, au depart, on vériie s'il y a déjà des messages en attente
 }
 
 void loop()
@@ -69,6 +71,7 @@ void loop()
 }
 
 void Instructions(){
+	// Ensemble de choix données à l'utilisateur
 	Serial.println("---------------");
 	Serial.println("Quelle action ?");
 	Serial.println("1 : Envoyer un SMS");
@@ -77,20 +80,21 @@ void Instructions(){
 }
 
 void Envoi(){
+	// Numéro de téléphone du destinataire de notre message
 	Serial.print("Numero du destinataire : ");
-	char Num_Destinataire[20];	// telephone number to send sms
+	char Num_Destinataire[20];
+	// On regarde ce que l'utilisateur tape dans le moniteur série et on l'affiche
 	Lecture_MoniteurSerie(Num_Destinataire);
 	Serial.println(Num_Destinataire);
-
 	// Text du SMS
 	Serial.print("Message : ");
 	char TextSMS[200];
+	// On regarde ce que l'utilisateur tape dans le moniteur série et on l'affiche
 	Lecture_MoniteurSerie(TextSMS);
 	Serial.println("Envoi en cours...");
 	Serial.println();
 	Serial.println("Contenu du message :");
 	Serial.println(TextSMS);
-
 	// Envoi du message
 	sms.beginSMS(Num_Destinataire);
 	sms.print(TextSMS);
@@ -102,46 +106,41 @@ void Envoi(){
 }
 
 void Reception(){
-	char Texto_LPL;		// Ici, en fait il s'agit du texto "lettre par lettre" qui est affiché
+	char Texto_LPL;		// Ici, en fait il s'agit du texto "lettre par lettre" ("LPL") qui est affiché
 
 	// Si un SMS est reçu()
 	if (sms.available()) {
 		Serial.println("Expediteur du SMS :");
-
-		// Obtention du numéro de l'expéditeur du SMS
+		// Obtention et affichage du numéro de l'expéditeur du SMS
 		sms.remoteNumber(Num_ExpediteurSMS, 20);
 		Serial.println(Num_ExpediteurSMS);
-
-		// Un exemple de supression de message
-		// Ex. : tout message commençant par un "#" devrait être effacé
-		if (sms.peek() == '#') {
-			Serial.println("Elimination du SMS");
-			sms.flush();
-		}
-
+		/* Messages qui seront automatiquement supprimés */
+			// Un exemple de supression de message
+			// Ex. : tout message commençant par un "#" devrait être effacé
+			if (sms.peek() == '#') {
+				Serial.println("Elimination du SMS");
+				sms.flush();
+			}
 		// Lecture des bytes du message et affichage sur le moniteur série
-		while (Texto_LPL = sms.read()) {						// Jusqu'à ce que les bytes lu par la fonction read() correspondent à la variable "c"
+		while (Texto_LPL = sms.read()) {		// Jusqu'à ce que les bytes lu par la fonction read() correspondent à la variable "c"
 			Serial.print(Texto_LPL);
 		}
-
 		Serial.println("\nFin du message");
-
 		// Suppression des messages de la memoire du modem
 		sms.flush();
 		Serial.println("Suppression du message OK");
 	}
-
+	// S'il n'y a aucun SMS
 	if(!sms.available()){
 	    Serial.println("Pas de nouveau message");
 	}
-
 	delay(1000);
 	Instructions();
 }
 
 // Fonction destinée à lire les entrées dans le Serial (temporaire puisqu'à terme l'interaction se fera avec des téléphones mobiles)
 int Lecture_MoniteurSerie(char Entree_Utilisateur[]) {
-	int Caractere = 0;											// "i" sert à se positionner dans les variables[i] : par exemple, dans Text_SMS[i], on va entrer les lettres à chaque position dans le tableau
+	int Caractere = 0;											// "Caractere" sert à se positionner dans les variables[i] : par exemple, dans Text_SMS[i], on va entrer les lettres à chaque position dans le tableau
 	while (true) {												// Jusqu'à ce que ("while") ce soit vérifié
 		while (Serial.available() > 0) {						// Ici, on cherche à voir s'il y a des infos dans le buffer du Serial. Et la boucle fait que tant qu'il y a des infos, on continue.
 			char Entree_Text = Serial.read();					// On met dans "Entree_Text" ce que le moniteur serie va lire "read"
