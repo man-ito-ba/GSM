@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ScappleDocument Version="1.1" ID="3EB5DD7E-460E-40B2-B9C3-3F9B432DDF89">
+    <Notes>
+        <Note ID="305" FontSize="28.0" Position="1407.0,804.0" Width="159.0">
+            <Appearance></Appearance>
+            <String>Projet GSM</String>
+            <Formatting>
+                <FormatRange Bold="Yes">0,10</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="306" FontSize="14.0" Position="5246.0,2918.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>New Note</String>
+        </Note>
+        <Note ID="307" FontSize="14.0" Position="2126.0,536.0" Width="107.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.077727 0.559807 0.805582</TextColor>
+                <Border Weight="1">0.077727 0.559807 0.805582</Border>
+                <Fill>0.751293 0.937828 0.984417</Fill>
+            </Appearance>
+            <String>Matériel requis</String>
+            <Formatting>
+                <FormatRange Bold="Yes">0,15</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="308" FontSize="14.0" Position="2118.0,659.0" Width="135.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.077727 0.559807 0.805582</TextColor>
+                <Border Weight="1">0.077727 0.559807 0.805582</Border>
+                <Fill>0.751293 0.937828 0.984417</Fill>
+            </Appearance>
+            <String>Arduino GSM Shield</String>
+            <ConnectedNoteIDs>310, 312, 317-318</ConnectedNoteIDs>
+        </Note>
+        <Note ID="309" FontSize="14.0" Position="2118.0,690.0" Width="72.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.077727 0.559807 0.805582</TextColor>
+                <Border Weight="1">0.077727 0.559807 0.805582</Border>
+                <Fill>0.751293 0.937828 0.984417</Fill>
+            </Appearance>
+            <String>Carte SIM</String>
+        </Note>
+        <Note ID="310" FontSize="11.0" Position="2280.0,698.0" Width="211.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Compatibilté avec MEGA, MEGA ADK, Yun, Leonardo (avec modification)</String>
+            <ConnectedNoteIDs>308, 316</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">0,67</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="311" FontSize="14.0" Position="1488.0,946.0" Width="61.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.261023 0.836819 0.319469</TextColor>
+                <Border Weight="1">0.261023 0.836819 0.319469</Border>
+                <Fill>0.868256 0.969271 0.887089</Fill>
+            </Appearance>
+            <String>Logiciel</String>
+            <Formatting>
+                <FormatRange Bold="Yes">0,8</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="312" FontSize="14.0" Position="1488.0,977.0" Width="52.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.261023 0.836819 0.319469</TextColor>
+                <Border Weight="1">0.261023 0.836819 0.319469</Border>
+                <Fill>0.868256 0.969271 0.887089</Fill>
+            </Appearance>
+            <String>GSM.h</String>
+            <ConnectedNoteIDs>308, 313, 319, 344</ConnectedNoteIDs>
+        </Note>
+        <Note ID="313" FontSize="11.0" Position="1660.0,979.0" Width="177.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>librairie inclue à partir de IDE 1.0.4</String>
+            <ConnectedNoteIDs>312</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">0,38</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="316" FontSize="11.0" Position="2503.0,705.0" Width="211.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>1.0 0.0 0.0</TextColor>
+            </Appearance>
+            <String>Ø compatible immédiatement avec Uno</String>
+            <ConnectedNoteIDs>310</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">0,35</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="317" FontSize="14.0" Position="2280.0,656.0" Width="380.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Connection : internet, envoie/réception SMS, appels vocaux</String>
+            <ConnectedNoteIDs>308</ConnectedNoteIDs>
+        </Note>
+        <Note ID="318" FontSize="11.0" Position="1883.0,655.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>1.0 0.0 0.0</TextColor>
+            </Appearance>
+            <String>n’est plus vendue mais beaucoup d’infos (officielles !) y font référence</String>
+            <ConnectedNoteIDs>308</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">0,72</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="319" FontSize="14.0" Position="2121.0,910.0" Width="147.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.077727 0.559807 0.805582</TextColor>
+                <Border Weight="1">0.077727 0.559807 0.805582</Border>
+                <Fill>0.751293 0.937828 0.984417</Fill>
+            </Appearance>
+            <String>Arduino GSM Shield 2</String>
+            <ConnectedNoteIDs>312, 334</ConnectedNoteIDs>
+        </Note>
+        <Note ID="320" FontSize="11.0" Position="2120.0,620.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>1.0 0.0 0.0</TextColor>
+            </Appearance>
+            <String>https://www.arduino.cc/en/Guide/ArduinoGSMShield</String>
+            <Formatting>
+                <FormatRange Link="https://www.arduino.cc/en/Guide/ArduinoGSMShield">0,48</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="321" FontSize="11.0" Position="2118.0,872.0" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>1.0 0.0 0.0</TextColor>
+            </Appearance>
+            <String>http://www.arduino.org/products/shields/arduino-gsm-shield-2</String>
+            <Formatting>
+                <FormatRange Link="https://www.arduino.cc/en/Guide/ArduinoGSMShield">0,60</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="322" FontSize="11.0" Position="2287.0,945.0" Width="123.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Compatibilté avec UNO</String>
+            <ConnectedNoteIDs>332</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">0,21</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="324" FontSize="14.0" Position="2288.0,910.0" Width="380.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Connection : internet, envoie/réception SMS, appels vocaux</String>
+        </Note>
+        <Note ID="325" FontSize="11.0" Position="2293.0,973.0" Width="59.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>2 versions</String>
+            <ConnectedNoteIDs>326-327</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Italic="Yes">0,10</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="326" FontSize="11.0" Position="2463.0,968.0" Width="138.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>antenne intégrée A000105</String>
+            <ConnectedNoteIDs>325</ConnectedNoteIDs>
+        </Note>
+        <Note ID="327" FontSize="11.0" Position="2463.0,995.0" Width="135.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>antenne externe A000106</String>
+            <ConnectedNoteIDs>325</ConnectedNoteIDs>
+        </Note>
+        <Note ID="332" FontSize="11.0" Position="2470.0,945.0" Width="135.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>interface : SoftwareSerial</String>
+            <ConnectedNoteIDs>322</ConnectedNoteIDs>
+            <Formatting>
+                <FormatRange Bold="Yes" Italic="Yes">0,9</FormatRange>
+                <FormatRange Italic="Yes">9,17</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="333" FontSize="14.0" Position="2118.0,941.0" Width="63.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.077727 0.559807 0.805582</TextColor>
+                <Border Weight="1">0.077727 0.559807 0.805582</Border>
+                <Fill>0.751293 0.937828 0.984417</Fill>
+            </Appearance>
+            <String>Mini SIM</String>
+        </Note>
+        <Note ID="334" FontSize="14.0" Position="1482.832386,1108.975142" Width="108.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.261023 0.836819 0.319469</TextColor>
+                <Border Weight="1">0.261023 0.836819 0.319469</Border>
+                <Fill>0.868256 0.969271 0.887089</Fill>
+            </Appearance>
+            <String>Commandes AT</String>
+            <ConnectedNoteIDs>319</ConnectedNoteIDs>
+        </Note>
+        <Note ID="335" FontSize="11.0" Position="1659.0,1017.0" Width="211.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>= instructions used to control a modem. AT is the abbreviation of ATtention.  Every command line starts with "AT" or "at". That's why modem commands are called AT commands.</String>
+            <Formatting>
+                <FormatRange Italic="Yes">0,172</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="336" FontSize="11.0" Position="2130.0,1080.0" Width="247.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Serial communication par les pins 2 (TX) et 3 (RX) avec le M10 (la chip installée sur le shield)</String>
+            <Formatting>
+                <FormatRange Italic="Yes">0,96</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="337" FontSize="11.0" Position="2130.0,1125.0" Width="263.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Bouton d’allumage connecté au pin 7 de l’Arduino</String>
+            <Formatting>
+                <FormatRange Italic="Yes">0,48</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="338" FontSize="14.0" Position="1255.0,1207.0" Width="110.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.667972 0.119731 0.915127</TextColor>
+                <Border Weight="1">0.667972 0.119731 0.915127</Border>
+                <Fill>0.926085 0.722098 0.999512</Fill>
+            </Appearance>
+            <String>Mise en oeuvre</String>
+            <Formatting>
+                <FormatRange Bold="Yes">0,14</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="339" FontSize="14.0" Position="1345.0,1359.039062" Width="135.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.667972 0.119731 0.915127</TextColor>
+                <Border Weight="1">0.667972 0.119731 0.915127</Border>
+                <Fill>0.926085 0.722098 0.999512</Fill>
+            </Appearance>
+            <String>Indiquer le code PIN</String>
+        </Note>
+        <Note ID="341" FontSize="14.0" Position="1345.0,1390.039062" Width="232.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.667972 0.119731 0.915127</TextColor>
+                <Border Weight="1">0.667972 0.119731 0.915127</Border>
+                <Fill>0.926085 0.722098 0.999512</Fill>
+            </Appearance>
+            <String>Définer l’APN (Access Point Name)</String>
+        </Note>
+        <Note ID="342" FontSize="14.0" Position="1345.0,1421.039062" Width="157.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.667972 0.119731 0.915127</TextColor>
+                <Border Weight="1">0.667972 0.119731 0.915127</Border>
+                <Fill>0.926085 0.722098 0.999512</Fill>
+            </Appearance>
+            <String>Entrer login &amp; password</String>
+        </Note>
+        <Note ID="343" FontSize="14.0" Position="1338.0,1255.0" Width="246.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>étapes nécessaires avant utilisation :</String>
+        </Note>
+        <Note ID="344" FontSize="14.0" Position="686.0,971.0" Width="152.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <TextColor>0.261023 0.836819 0.319469</TextColor>
+                <Border Weight="1">0.261023 0.836819 0.319469</Border>
+                <Fill>0.868256 0.969271 0.887089</Fill>
+            </Appearance>
+            <String>Possibilitées du logiciel</String>
+            <ConnectedNoteIDs>312</ConnectedNoteIDs>
+        </Note>
+        <Note ID="346" FontSize="14.0" Position="354.0,972.0" Width="140.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Obtenir position GPS</String>
+        </Note>
+        <Note ID="347" FontSize="11.0" Position="1597.0,1392.039062" Width="147.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Utile pour accéder à internet</String>
+            <Formatting>
+                <FormatRange Italic="Yes">0,29</FormatRange>
+            </Formatting>
+        </Note>
+        <Note ID="348" FontSize="14.0" Position="353.0,1011.0" Width="146.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>envoyer/recevoir SMS</String>
+        </Note>
+        <Note ID="349" FontSize="14.0" Position="353.0,1050.0" Width="170.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>envoyer/recevoir APPELS</String>
+        </Note>
+        <Note ID="350" FontSize="14.0" Position="354.0,1089.0" Width="151.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>envoyer/recevoir DATA</String>
+        </Note>
+        <Note ID="351" FontSize="14.0" Position="1346.0,1301.0" Width="91.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Insertion SIM</String>
+        </Note>
+        <Note ID="352" FontSize="14.0" Position="1346.0,1332.0" Width="452.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+            </Appearance>
+            <String>Pins 2,3,7 réservés à la communication avec le SHIED</String>
+        </Note>
+    </Notes>
+    <BackgroundShapes></BackgroundShapes>
+    <Stacks>
+        <Stack>308-309</Stack>
+        <Stack>311-312</Stack>
+        <Stack>326-327</Stack>
+        <Stack>339, 341-342</Stack>
+        <Stack>351-352</Stack>
+    </Stacks>
+    <AutoFit>305, 307-309, 311-313, 317, 319, 322, 324-327, 332-334, 338-339, 342, 344, 346-351</AutoFit>
+    <NoteStyles>
+        <Style Name="Bleu" ID="F02AB4D4-F9E3-4813-B21B-B230CF64C9B5" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>12.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>0.077727 0.559807 0.805582</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.077727 0.559807 0.805582</BorderColor>
+            <FillColor>0.751293 0.937828 0.984417</FillColor>
+            <Size>63.0,150.0</Size>
+        </Style>
+        <Style Name="Commentaire" ID="7ED25980-57F7-493F-AF89-F5905953E3A9" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="Yes" AffectFade="No" AffectSticky="Yes">
+            <FontSize>11.0</FontSize>
+            <Alignment>Left</Alignment>
+            <BorderThickness>0</BorderThickness>
+            <Size>211.0,150.0</Size>
+            <IsItalic>Yes</IsItalic>
+        </Style>
+        <Style Name="Gris" ID="BBF04722-CD9C-404E-AED1-82836BAE9991" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>12.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>0.412474 0.412474 0.412474</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.412474 0.412474 0.412474</BorderColor>
+            <FillColor>0.902657 0.902657 0.902657</FillColor>
+            <Size>71.0,150.0</Size>
+        </Style>
+        <Style Name="Important" ID="48B335E4-37E2-42BB-8B44-7DCDCE2AC2CD" AffectFontStyle="Yes" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>11.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>1.0 0.0 0.0</TextColor>
+            <BorderThickness>0</BorderThickness>
+            <Size>200.0,150.0</Size>
+            <IsItalic>Yes</IsItalic>
+        </Style>
+        <Style Name="Jaune" ID="316133A9-9866-48FB-B2D3-1AB278B38FE0" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>12.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>0.491645 0.454569 0.060739</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.491645 0.454569 0.060739</BorderColor>
+            <FillColor>0.999285 0.94889 0.386333</FillColor>
+            <Size>71.0,150.0</Size>
+        </Style>
+        <Style Name="Mauve" ID="F5C62445-65C3-4EDF-AA55-9648158D640B" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>12.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>0.667972 0.119731 0.915127</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.667972 0.119731 0.915127</BorderColor>
+            <FillColor>0.926085 0.722098 0.999512</FillColor>
+            <Size>71.0,150.0</Size>
+        </Style>
+        <Style Name="Note" ID="C28C303A-D021-4FDB-9E1F-58D0ED6AA361" AffectFontStyle="Yes" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>10.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>0.412474 0.412474 0.412474</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>1.0 1.0 1.0</BorderColor>
+            <FillColor>1.0 1.0 1.0</FillColor>
+            <Size>60.0,150.0</Size>
+            <IsItalic>Yes</IsItalic>
+        </Style>
+        <Style Name="Orange" ID="3ACD6C93-A98E-446D-B356-F13FFCD4F3EB" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>12.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>1.0 0.501961 0.0</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>1.0 0.501961 0.0</BorderColor>
+            <FillColor>0.993018 0.908192 0.79289</FillColor>
+            <Size>71.0,150.0</Size>
+        </Style>
+        <Style Name="Rouge" ID="32D532D5-39D8-400E-82D8-481851A6A756" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>12.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>0.966844 0.153536 0.098563</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.966844 0.153536 0.098563</BorderColor>
+            <FillColor>0.995719 0.812238 0.816601</FillColor>
+            <Size>71.0,150.0</Size>
+        </Style>
+        <Style Name="Title Text" ID="6C7C0E06-A18D-4315-988A-E1FE6EE69832" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="No" AffectNoteBody="No" AffectFade="No">
+            <FontSize>28.0</FontSize>
+            <IsBold>Yes</IsBold>
+        </Style>
+        <Style Name="Vert" ID="C4D3B306-C8A9-48B5-912B-BFFA30F4EC66" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="Yes" AffectSize="No" AffectFade="No" AffectSticky="Yes">
+            <FontSize>12.0</FontSize>
+            <Alignment>Left</Alignment>
+            <TextColor>0.261023 0.836819 0.319469</TextColor>
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.261023 0.836819 0.319469</BorderColor>
+            <FillColor>0.868256 0.969271 0.887089</FillColor>
+            <Size>71.0,150.0</Size>
+        </Style>
+    </NoteStyles>
+    <UISettings>
+        <BackgroundColor>1.0 1.0 1.0</BackgroundColor>
+        <DefaultFont>Helvetica</DefaultFont>
+        <DefaultTextColor>0.298039 0.298039 0.298039</DefaultTextColor>
+    </UISettings>
+    <PrintSettings PaperSize="595.000005,842.0" LeftMargin="72.0" RightMargin="72.0" TopMargin="90.0" BottomMargin="90.0" PaperType="iso-a4" Orientation="Portrait" HorizontalPagination="Clip" VerticalPagination="Auto" ScaleFactor="1.0" HorizontallyCentered="Yes" VerticallyCentered="Yes" Collates="Yes" PagesAcross="1" PagesDown="1"></PrintSettings>
+</ScappleDocument>
