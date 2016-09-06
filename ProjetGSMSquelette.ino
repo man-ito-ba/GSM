@@ -28,12 +28,14 @@ char Num_ExpediteurSMS[20];
 /* Matériel */
 const int LED = 13;
 unsigned long LED_UtilisationRestante;		// Cet variable doit être très longue...
-byte LED_Etat;
+bool LED_Etat;
+long Debounce = 200;						// Variable utilisée pour laisser le temps à 
 
 const int Potentio = A0;
 
 const byte Bouton = 3;
-byte Bouton_Etat;
+bool Bouton_Etat;
+bool Bouton_EtatPrecedent;
 
 // Diverses string
 int LED_SwitchSMS;
@@ -85,6 +87,7 @@ void Reception(){
 	}
 }
 
+
 void Recapitulatif_Instructions(){
 	// Une fonction appelée par la réception de la suite "1234567890" ou "Instructions" 
 	char InstructionsUtilisateur[] = 
@@ -97,6 +100,7 @@ void Recapitulatif_Instructions(){
 	sms.print(InstructionsUtilisateur);
 	sms.endSMS();
 }
+
 
 void Verification_Periodique(){
 	/* 3 conditions
@@ -124,6 +128,26 @@ void Etat_Boutons(){
 void Allumage_LED(){
 	// Leds allumées par bouton ou SMS
 	// Par le bouton
+	if(Bouton_Etat == LOW && Bouton_EtatPrecedent == LOW){
+		if(LED_Etat == HIGH){
+		    digitalWrite(LED, LOW);	
+		} 
+		else{
+			digitalWrite(LED, HIGH);
+		}
+	}
+	Bouton_EtatPrecedent = Bouton_Etat;
+
+	if(!Bouton_Etat){
+		if(!LED_Etat){
+			digitalWrite(LED, HIGH);
+			LED_Etat = HIGH;
+		} else{
+			digitalWrite(LED, LOW);
+			LED_Etat = LOW;
+		}
+	}
+
 	if(Bouton_Etat == LOW && LED_Etat == LOW){
 		digitalWrite(LED, HIGH);
 		LED_Etat = HIGH;

@@ -12,14 +12,15 @@ char Num_ExpediteurSMS[20];
 
 void setup()
 {
+	Serial.println("**************************");
+	Serial.println("** Programme SMS in/out **");
+	Serial.println("**************************");
+	
 	// Initialisation des communication avec le moniteur serie et attente de l'ouverture du port
 	Serial.begin(9600);
 	while (!Serial) {
 		; // On attend que le port Serial se connecte, ce qui est surtout indispensable seulement pour le port USB natif
 	}
-	Serial.println("**************************");
-	Serial.println("** Programme SMS in/out **");
-	Serial.println("**************************");
 
 	// Bool d'état de la connection
 	bool notConnected = true;
