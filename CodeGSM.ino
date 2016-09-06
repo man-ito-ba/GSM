@@ -131,6 +131,7 @@ void Reception(){
 		// Suppression des messages de la memoire du modem
 		sms.flush();
 		Serial.println("Suppression du message OK");
+		delay(1000);
 	}
 	// S'il n'y a aucun SMS
 	if(!sms.available()){
