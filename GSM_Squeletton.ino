@@ -31,26 +31,32 @@ unsigned long MillisActuel;
 char Message_Transmis;
 
 // Identifiant du système
-char SystemeID[] = "--Lampe UV de Brignoles--";
+char SystemeID[] = "--Lampe UV de Brignoles-- ";
 
 // Message de démarrage
-char TextSMS_MiseEnMarche[] = "Systeme actif. Acces au reseau GSM : OK.";
+char Theme_MiseEnMarche[]   = "Activation : ";
+char TextSMS_MiseEnMarche[] = "Systeme actif. Acces au reseau GSM OK.";
 
 // Instructions utilisateur
-char InstructionsUtilisateur[] = "Instructions :\n0 : Recevoir l'ensemble des instructions ;\n1 : Allumer/Eteindre la LED ;\n2 : Obtenir l'etat de la LED ;\n3 : Verifier le temps d'utilisation de l'Arduino.";
+char Theme_Instructions[]              = "Instructions : ";
+char TextSMS_InstructionsUtilisateur[] = "\n0 : Rappel des instructions ;\n1 : Allumer/Eteindre la LED ;\n2 : Obtenir l'etat de la LED ;\n3 : Verifier le temps d'utilisation de l'Arduino";
 
 // Messages de fonctionnement
-char TextSMS_SmsLedOff[]        = "Commande SMS : LED OFF";
-char TextSMS_SmsLedOn[]         = "Commande SMS : LED ON";
-char TextSMS_BoutonLedOff[]     = "Appui sur bouton : LED OFF";
-char TextSMS_BoutonLedOn[]      = "Appui sur bouton : LED ON";
-char TextSMS_EtatLedOn[]        = "Controle d'etat : la LED est ON";
-char TextSMS_EtatLedOff[]       = "Controle d'etat : la LED est OFF";
-char TextSMS_TempsUtilisation[] = "L'arduino tourne depuis ";
+char Theme_LED[]            = "LED : ";
+char TextSMS_SmsLedOff[]    = "Commande SMS : OFF";
+char TextSMS_SmsLedOn[]     = "Commande SMS : ON";
+char TextSMS_BoutonLedOff[] = "Appui sur bouton : OFF";
+char TextSMS_BoutonLedOn[]  = "Appui sur bouton : ON";
+char TextSMS_EtatLedOn[]    = "Controle d'etat : est ON";
+char TextSMS_EtatLedOff[]   = "Controle d'etat : est OFF";
+
+// Temps d'utilisation
+char Theme_TempsUtilisation[] = "L'arduino tourne depuis ";
 
 // Message d'alerte
-char TextSMS_ErreurInstruction[]    = "Attention, votre instruction n'est pas correcte. Envoyez '0' pour obtenir les instructions valides.";
-char TextSMS_AlertePotentiometre[]  = "Attention, le niveau du potentiometre vient d'attendre 75 pour cent.";
+char Theme_Alerte[]                = "Attention, ";
+char TextSMS_AlerteInstruction[]   = "votre instruction n'est pas correcte. Envoyez '0' pour obtenir les instructions valides.";
+char TextSMS_AlertePotentiometre[] = "le niveau du potentiometre vient d'attendre 75 pour cent.";
 
 // ==== Matériel
 // ======== LED & variables nécessaires à son fonctionnement
@@ -120,7 +126,7 @@ void setup()
 	Serial.println(F("**************************"));
 
 	digitalWrite(LED, LOW);								// la led s'éteint et marque la fin du setup()
-	Envoi(TextSMS_MiseEnMarche);						// On envoi un texto au client une fois le système activé.
+	Envoi(Theme_MiseEnMarche, TextSMS_MiseEnMarche);						// On envoi un texto au client une fois le système activé.
 }
 
 
@@ -162,7 +168,7 @@ void EliminationMauvaiseInstructions(){
 		if (sms.peek() < 48 || sms.peek() > 57)
 		{													// On utilise les codes ASCII des caractères
 			Serial.print(F("Instruction erronee : "));
-			Envoi(TextSMS_ErreurInstruction);
+			Envoi(Theme_Alerte, TextSMS_AlerteInstruction);
 			EffacementDesSMS();
 		}
 	}
@@ -177,7 +183,7 @@ void InstructionSMS(){
 
 		// ======= Instructions
 		if(Choix_Action == 0){
-			Envoi(InstructionsUtilisateur);					// 0 : instructions utilisateurs
+			Envoi(Theme_Instructions, TextSMS_InstructionsUtilisateur);					// 0 : instructions utilisateurs
 		}
 		else if(Choix_Action == 1){							// 1 : Allumer / éteindre LED
 			SMS_LED = HIGH;									// On passe la booléenne de la LED en high
@@ -185,6 +191,9 @@ void InstructionSMS(){
 		}
 		else if(Choix_Action == 2){
 			EtatDeLaLED();
+		}
+		else if(Choix_Action == 3){
+			TempsUtilisationArduino();
 		}
 
 		EffacementDesSMS();
@@ -211,12 +220,12 @@ void InstructionBouton(){
 		if(LED_Etat == HIGH){		 			// et que la LED est déjà allumée
 			LED_Etat = LOW;			 			// on passe l'état (et non pas a led) à "éteint"
 			delay(100);
-			Envoi(TextSMS_BoutonLedOff);
+			Envoi(Theme_LED, TextSMS_BoutonLedOff);
 		}
 		else {
 			LED_Etat = HIGH;					// et vice-versa
 			delay(100);
-			Envoi(TextSMS_BoutonLedOn);
+			Envoi(Theme_LED, TextSMS_BoutonLedOn);
 		}
 	}
 }
@@ -225,12 +234,12 @@ void LEDallumageSMS(bool SMS_LED){
 		if(LED_Etat == HIGH){
 			LED_Etat = LOW;
 			delay(100);
-		    Envoi(TextSMS_SmsLedOff);
+		    Envoi(Theme_LED, TextSMS_SmsLedOff);
 		}
 		else {
 			LED_Etat = HIGH;
 			delay(100);
-			Envoi(TextSMS_SmsLedOn);
+			Envoi(Theme_LED, TextSMS_SmsLedOn);
 		}
 }
 
@@ -241,34 +250,43 @@ void AllumageExtinctionLED(){
 
 void EtatDeLaLED(){
 	if(LED_Etat){					// Cette fonction sert à indiquer à l'utilisateur l'état actuel de la LED
-	    Envoi(TextSMS_EtatLedOn);
+	    Envoi(Theme_LED, TextSMS_EtatLedOn);
 	}
 	else{
-		Envoi(TextSMS_EtatLedOff);
+		Envoi(Theme_LED, TextSMS_EtatLedOff);
 	}
 }
 
-
 void TempsUtilisationArduino(){
-	return;
-	MillisActuel = millis();
-	// int Hours   =   Milliseconds / (1000*60*60);
-	// int Minutes =  (Milliseconds % (1000*60*60)) / (1000*60);
-	// int Seconds = ((Milliseconds % (1000*60*60)) % (1000*60)) / 1000;
-	//Envoi(TextSMS_TempsUtilisation, MillisActuel);
+	char *Temps_Utilisation;
+	Temps_Utilisation = TempsVersString(millis()/1000);		// Je suis obligé de convertir millis en un String, et on me renverra un tableau char d'ailleurs, pour pouvoir l'envoyer par texto ensuite
+	Serial.println(Temps_Utilisation);
+	Envoi(Theme_TempsUtilisation, Temps_Utilisation);
+}
+
+// TempsEnSecondes est le temps en secondes issu du calcul "millis()/1000" dans la boucle précédente
+char * TempsVersString(unsigned long TempsEnSecondes){
+	static char Temps_Total[12];
+	long Heu 		= TempsEnSecondes / 3600;
+	TempsEnSecondes = TempsEnSecondes % 3600;
+	int Min 		= TempsEnSecondes / 60;
+	int Sec 		= TempsEnSecondes % 60;
+	sprintf(Temps_Total, "%02ld:%02d:%02d", Heu, Min, Sec);	// c'est en changeant les chiffres après chaque "0%" qu'on définit le nb de zéros
+	return Temps_Total;
 }
 
 // ****************************************************************************
 // *                                   Envoi                                  *
 // ****************************************************************************
 
-void Envoi(char Message[]){
+void Envoi(char Theme[], char Message[]){
 	Serial.print(F("[Envoi du message] "));
 	Serial.println(SystemeID);
 	Serial.print(Message);
 
 	sms.beginSMS(Num_Utilisateur);
 	sms.print(SystemeID);
+	sms.print(Theme);
 	sms.print(Message);
 
 	sms.endSMS();
