@@ -4,10 +4,10 @@
 	*/
 
 // Numéro de la SIM : 0688364880
-// Étape importante : configurer la bande de fréquence utilisée par le modem, en lançant le croquis "BandManagement"
+// Étape importante : configurer la bande de fréquence utilisée par le modem, en lançant le croquis "BandManagement" #MU
 
 // Librairie de watchdog, utilisée pour la fonction de reset
-#include <avr/wdt.h>
+// #include <avr/wdt.h>
 
 // Initialisation de la librairie GSM
 #include <GSM.h>
@@ -20,38 +20,39 @@ GSM_SMS sms;
 #define CodePIN ""
 
 // Tableau destiné à conserver le numéro de l'expéditeur d'un SMS reçu par le shield
-char Num_ExpediteurSMS[20];
-char Num_Utilisateur[] = "+33603353147";
+char Num_Expediteur[20];
+char Num_Administrateur[] = "+33603353147";
 
 bool SMS_LED;			// variable qui permet l'allumage / extinction de la led par texto
 bool SMS_PrecedentLED;	// variable est destiné à enregistrer l'état précédent de la LED
 
 // Gestion du temps
+const int Sec = 1000;
 unsigned long MillisPrecedent = 0;
-unsigned long MillisInterval  = 1000;
+unsigned long MillisInterval = 10000;
 unsigned long MillisActuel;
 
 // ======== Différents contenus de SMS
-// La fonction Envoi comprend deux paramètres : un thème ("Theme_...", et le contenu "Text_...")
+// La fonction Envoi comprend trois paramètres : un thème ("Theme_...", et le contenu divisé en deux messages "Text_...".)
 
 // Identifiant du système
-char SystemeID[] = "\n-Robot GSM de Brignoles-\n";
+char SystemeID[] = "\n-Robot GSM de Brignoles-";
 
 // Message de démarrage
-char Theme_MiseEnMarche[]   = "Activation du systeme. ";
-char Text_MiseEnMarche[] = "\nAcces au reseau GSM OK.";
+char Theme_MiseEnMarche[]   = "\nActivation du systeme. ";
+char Text_MiseEnMarche[] = "Acces au reseau GSM OK.";
 
-// Instructions utilisateur
+// Rappel des instructions utilisateur
 char Theme_Instructions[]           = "Instructions :";
 char Text_InstructionsUtilisateur[] = "\n0 : Rappel des instructions ;\n1 : Allumer/Eteindre la LED ;\n2 : Obtenir l'etat de la LED ;\n3 : Verifier le temps d'utilisation de l'Arduino";
 
 // Messages de fonctionnement LED
-char Theme_LED[]      = " [LED] ";
-char Text_SmsLED[]    = "Commande SMS : ";
-char Text_BoutonLED[] = "Appui sur bouton : ";
-char Text_EtatLED[]   = "Controle d'etat : ";
-char Text_LEDOff[]    = "OFF.";
-char Text_LEDOn[]     = "ON.";
+char Theme_LED[]      = "\nLED > ";
+char Text_SmsLED[]    = "Commande SMS > ";
+char Text_BoutonLED[] = "Appui sur bouton > ";
+char Text_EtatLED[]   = "Controle d'etat > ";
+char Text_LEDOff[]    = "OFF";
+char Text_LEDOn[]     = "ON";
 
 // Temps d'utilisation
 char Theme_TempsUtilisation[] = "L'arduino tourne depuis ";
@@ -59,12 +60,13 @@ char Temps_UtilisationUnite[] = " au total.";
 
 // Message d'alerte
 char Theme_Alerte[]                   = "Attention, ";
-char Text_AlerteInstruction[]         = "votre instruction n'est pas correcte.";
+char Text_AlerteInstruction[]         = "votre instruction n'est pas correcte. ";
 char Text_AlerteInstructionCorrecte[] = "Envoyez '0' pour obtenir les instructions valides.";
 char Text_AlertePotentiometre[]       = "le niveau du potentiometre vient d'attendre 75 pour cent.";
 char Text_AlerteIntrusion[]           = "une personne non enregistree a envoye une instruction (qui a ete ignoree). Voici son numero : ";
 
-char Text_PostScriptumNull[] = "";
+// Texte vide, au cas où je ne souhaite pas envoyer un Message2, la troisième partie des textos.
+char Text_Null[] = "";
 
 // ==== Matériel
 // ======== LED & variables nécessaires à son fonctionnement
@@ -72,10 +74,10 @@ const int LED = 12;
 bool LED_Etat;
 
 // ======== Bouton & variables associées à son bon fonctionnement
-const int Bouton = 4;			 	// Bouton branché au pin 3
+const int Bouton = 4;			 	// Bouton d'allumage de la LE
 bool Bouton_Etat;				 	// Booléenne enregistrant l'état du bouton par la fonction digitalRead()
-bool Bouton_EtatPrecedent = HIGH;	// Booléenne enregistrant l'état précédant du bouton
-					// En l'occurence il est "HIGH" car, branché en INPUT_PULLUP, c'est ce qu'il renvoi en digitalRead
+bool Bouton_EtatPrecedent;			// Booléenne enregistrant l'état précédant du bouton
+									// En l'occurence il est "HIGH" car, branché en INPUT_PULLUP, c'est ce qu'il renvoi en digitalRead
 long Bouton_Temps    = 0;			// La dernière fois que le bouton a été pressé
 long Bouton_Debounce = 200;			// Laps de temps que l'on estime nécessaire pour effectuer l'enregistrement du nouvel état du bouton (lorsqu'il est pressé). Après avec les bons composants électronique, on peut éviter les effets de rebonds du signal.
 
@@ -92,26 +94,26 @@ void setup()
 	SMS_LED, SMS_PrecedentLED,
 	Potentiometre,
 	Bouton_Etat,
+	Bouton_EtatPrecedent,
 	LED_Etat,
-	MillisActuel
+	MillisActuel,
+	MillisInterval
 	= 0;
 
-	// ======= INITIALISATION MATÉRIEL
+	// ======= Initialisation matériel
 	pinMode(Bouton, INPUT_PULLUP);
 
 	pinMode(LED, OUTPUT);
-	digitalWrite(LED, HIGH);							// La LED est ON, marquant le début du setup*()
+	digitalWrite(LED, HIGH);									// La LED est ON, marquant le début du setup()
 	
 	// ======= Initialisation moniteur série
 	Serial.begin(9600);
 	while (!Serial) {
-		; 												// On attend que le port Serial se connecte, ce qui est surtout indispensable seulement pour le port USB natif
+		; 														// On attend que le port Serial se connecte, ce qui est surtout indispensable seulement pour le port USB natif
 	}
 
-	ConnectionAuReseau();								// Fonction de connection au réseau
-
-	// Au démarrage, les textos en attente dans le modem sont toujours effacés pour éviter les conflits. #MU
-	EffacementDesSMS();
+	// ======= Connection au réseau
+	ConnectionReseau();										// Fonction de connection au réseau
 
 	delay(1000);
 
@@ -120,21 +122,23 @@ void setup()
 	Serial.println(F("** Programme SMS in/out **"));
 	Serial.println(F("**************************"));
 
-	digitalWrite(LED, LOW);															// la led s'éteint et marque la fin du setup()
-	Envoi(Theme_MiseEnMarche, Text_MiseEnMarche, Text_PostScriptumNull);		// On envoi un texto au client une fois le système activé.
+	digitalWrite(LED, LOW);										// la led s'éteint et marque la fin du setup()
+
+	Envoi(Theme_MiseEnMarche, Text_MiseEnMarche, Text_Null);	// On envoi un texto au client une fois le système activé.
+	
+	SuppressionSMS();											// Au démarrage, les textos en attente dans le modem sont toujours effacés pour éviter les conflits. #MU
 }
 
 
 // ****************************************************************************
-// *                                   Loop                                   *
+// *                                   LOOP                                   *
 // ****************************************************************************
 
 void loop()
 {
 	// Millis() ? Pour checker seulement toutes les 10 min ? :(
-	// ConnectionAuReseau();	// À chaque tour de loop, on check la connection (ou alors )
 
-	InstructionSMS();			// Instructions données par SMS
+	ReceptionSMS();				// Instructions données par SMS
 
 	InstructionBouton();		// Instructions données par le bouton physique
 	
@@ -148,12 +152,12 @@ void loop()
 // ****************************************************************************
 
 
-void ResetLogiciel(void) {
-	wdt_enable(WDTO_15MS);								// Fonction de reset
-	for(;;);
-}
+// void VerificationPlantage(void) {
+	// wdt_enable(WDTO_1S);		// Fonction de reset : trop courte car reboot après 1 seconde. Or, il arrive pour des raisons valides que le programme ne repasse pas par cette boucle à temps...
+	// for(;;);
+// }
 
-void ConnectionAuReseau(){
+void ConnectionReseau(){
 	bool PasDeConnection = true;						// Bool d'état de la connection
 	while (PasDeConnection) {							// Démarrage du shield GSM
 		Serial.println(F("[Recherche reseau]"));
@@ -172,34 +176,31 @@ void ConnectionAuReseau(){
 // *                                 Reception                                *
 // ****************************************************************************
 
-void InstructionSMS(){
+void ReceptionSMS(){
 	if(sms.available()){		// Avec cette boucle, s'il y a quoi que ce soit de dispo dans le buffer du modem, je le lis
-		
 		NumeroExpediteur();		// Relevé du numéro de l'expéditeur
-		
 		MauvaisNumero();		// En cas de mauvais numéro
-		
-		MauvaiseInstruction();	// En cas d'instruction erronnée
-
-		SetInstructions();		// Actions à entreprendre en fonction des instructions
+		MauvaiseInstruction();	// En cas d'instruction erronné
+		// LectureSMS();		// Impression du message sur le moniteur série (pour débugger)
+		InstructionSMS();		// Actions à entreprendre en fonction des instructions
 	}
 }
 
 void NumeroExpediteur(){
 	Serial.print(F("\n[SMS recu du "));
-	sms.remoteNumber(Num_ExpediteurSMS, 20);	// On stock le numéro de l'expéditeur (il y a de grandes chances que ce soit le numéro de l'utilisateur préenregistré)
-	Serial.print(Num_ExpediteurSMS);
-	Serial.println("]");
+	sms.remoteNumber(Num_Expediteur, 20);	// On stock le numéro de l'expéditeur (il y a de grandes chances que ce soit le numéro de l'utilisateur préenregistré)
+	Serial.print(Num_Expediteur);
+	Serial.println(F("]"));
 }
 
 void MauvaisNumero(){
 	for(int i = 0; i < 12; i++){											// La boucle va en 12 parce que le numéro est composé de douze chiffres (avec le "+33" et sans le premier "0")
-	    if(Num_ExpediteurSMS[i] == Num_Utilisateur[i]);
+	    if(Num_Expediteur[i] == Num_Administrateur[i]);
 		else{
 			Serial.println(F("Numero pas compatible..."));					// Si un chiffre diffère, on efface le message, empêchant l'instruction d'être effectuée
-			Envoi(Theme_Alerte, Text_AlerteIntrusion, Num_ExpediteurSMS);	// et on prévient l'utilisateur de l'intrusion
-			EffacementDesSMS();
-			return;
+			Envoi(Theme_Alerte, Text_AlerteIntrusion, Num_Expediteur);	// et on prévient l'utilisateur de l'intrusion
+			SuppressionSMS();
+			return;															// Une fois le faux numéro détecté, on sort de for() pour éviter d'envoyer inutilement les alertes d'intrusion, et on retourne à la boucle précédente
 	    }
 	}
 }
@@ -208,11 +209,18 @@ void MauvaiseInstruction(){
 	if (sms.peek() < 48 || sms.peek() > 57){					// On utilise les codes ASCII des caractères
 		Serial.print(F("Instruction erronee : "));
 		Envoi(Theme_Alerte, Text_AlerteInstruction, Text_AlerteInstructionCorrecte);
-		EffacementDesSMS();
+		SuppressionSMS();
 	}
 }
 
-void SetInstructions(){
+// void LectureSMS(){
+// 	char Texto_LPL;						// Ici, en fait il s'agit du texto "lettre par lettre" qui est affiché
+// 	while (Texto_LPL = sms.read()) {	// Lecture des bytes du message et affichage sur le moniteur série
+// 		Serial.print(Texto_LPL);
+// 	}
+// }
+
+void InstructionSMS(){
 	// ======= Si on a reçu un texto
 	// if(sms.available()){									// Avec cette boucle, s'il y a quoi que ce soit de dispo dans le buffer du modem, je le lis
 	// ======= Lecture du choix de l'expéditeur
@@ -220,29 +228,29 @@ void SetInstructions(){
 	Serial.println(Choix_Action);
 
 	// ======= Instructions
-	if(Choix_Action == 0){
-		Envoi(Theme_Instructions, Text_InstructionsUtilisateur, Text_PostScriptumNull);					// 0 : instructions utilisateurs
-	}
-	else if(Choix_Action == 1){							// 1 : Allumer / éteindre LED
-		SMS_LED = HIGH;									// On passe la booléenne de la LED en high
+	if(Choix_Action        == 0){				// 0 : instructions utilisateurs
+		Envoi(Theme_Instructions,
+			  Text_InstructionsUtilisateur,
+			  Text_Null);
+	} else if(Choix_Action == 1){				// 1 : Allumer / éteindre LED
+		SMS_LED = HIGH;							// On passe la booléenne de la LED en high
 		LEDallumageSMS(SMS_LED);
-	}
-	else if(Choix_Action == 2){
-		EtatDeLaLED();
-	}
-	else if(Choix_Action == 3){
+	} else if(Choix_Action == 2){
+		ControleEtatLED();
+	} else if(Choix_Action == 3){
 		TempsUtilisationArduino();
 	}
 
-	EffacementDesSMS();
+	SuppressionSMS();
 }
 
-void EffacementDesSMS(){
-	while(sms.available() > 0)
-	{
-	    sms.flush();			// avec while(), on tourne tant que le ou les SMS reçus n'ont pas tous été effacés
-	}
-	Serial.println(F("...Message(s) efface(s)\n"));
+void SuppressionSMS(){
+	Serial.print(F("["));
+	do{
+		sms.flush();
+		Serial.print(F("."));
+	} while (sms.available() > 0);
+	Serial.println(F("X.]\n"));
 }
 
 
@@ -285,12 +293,14 @@ void AllumageExtinctionLED(){
 	Bouton_EtatPrecedent = Bouton_Etat; 		// sans oublier d'enregistrer l'état du bouton
 }
 
-void EtatDeLaLED(){
-	if(LED_Etat){					// Cette fonction sert à indiquer à l'utilisateur l'état actuel de la LED
-	    Envoi(Theme_LED, Text_EtatLED, Text_LEDOn);
-	}
-	else{
-		Envoi(Theme_LED, Text_EtatLED, Text_LEDOff);
+void ControleEtatLED(){
+	switch (LED_Etat) {									// Cette fonction sert à indiquer à l'utilisateur l'état actuel de la LED
+	    case 0:
+	      Envoi(Theme_LED, Text_EtatLED, Text_LEDOff);
+	      break;
+	    case 1:
+	      Envoi(Theme_LED, Text_EtatLED, Text_LEDOn);
+	      break;
 	}
 }
 
@@ -301,19 +311,18 @@ void EtatDeLaLED(){
 
 void TempsUtilisationArduino(){
 	char *Temps_Utilisation;
-	Temps_Utilisation = TempsVersString(millis()/1000);		// Je suis obligé de convertir millis en un String, et on me renverra un tableau char d'ailleurs, pour pouvoir l'envoyer par texto ensuite
+	Temps_Utilisation = TempsVersString(millis()/1000);							// Je suis obligé de convertir millis en un String, et on me renverra un tableau char d'ailleurs, pour pouvoir l'envoyer par texto ensuite
 	Serial.println(Temps_Utilisation);
 	Envoi(Theme_TempsUtilisation, Temps_Utilisation, Temps_UtilisationUnite);
 }
 
-// TempsEnSecondes est le temps en secondes issu du calcul "millis()/1000" dans la boucle précédente
-char * TempsVersString(unsigned long TempsEnSecondes){
+char * TempsVersString(unsigned long TempsEnSecondes){			// TempsEnSecondes est le temps en secondes issu du calcul "millis()/1000" dans la boucle précédente
 	static char Temps_Total[12];
 	long Heu 		= TempsEnSecondes / 3600;
 	TempsEnSecondes = TempsEnSecondes % 3600;
 	int Min 		= TempsEnSecondes / 60;
 	int Sec 		= TempsEnSecondes % 60;
-	sprintf(Temps_Total, "%02ldh%02dmin%02ds", Heu, Min, Sec);	// c'est en changeant les chiffres après chaque "0%" qu'on définit le nb de zéros
+	sprintf(Temps_Total, "%02ldh%02dmin%02ds", Heu, Min, Sec);	// c'est en changeant les chiffres après chaque "%0" qu'on définit le nb de zéros
 	return Temps_Total;
 }
 
@@ -322,26 +331,16 @@ char * TempsVersString(unsigned long TempsEnSecondes){
 // ****************************************************************************
 
 void Envoi(char Theme[], char Message1[], char Message2[]){
-	Serial.print(F("[Envoi du message] "));
-	Serial.println(SystemeID);
+	Serial.print(F("\n[Envoi du message...\n"));
 	Serial.print(Message1);
 	Serial.println(Message2);
 
-	sms.beginSMS(Num_Utilisateur);
+	sms.beginSMS(Num_Administrateur);
 	sms.print(SystemeID);
 	sms.print(Theme);
 	sms.print(Message1);
 	sms.print(Message2);
 
 	sms.endSMS();
-	Serial.println(F("\n[X]"));
+	Serial.println(F("...fin du message]"));
 }
-
-void ComparaisonNumExpediteurNumUtilisateur(char Num_ExpediteurSMS){
-	return;
-	for(int i = 0; i < 11; i++){
-		// Num_Utilisateur_Index = Num_Utilisateur[i];
-		// Num_ExpediteurIndex   = Num_ExpediteurSMS[i];
-	}
-}
-
