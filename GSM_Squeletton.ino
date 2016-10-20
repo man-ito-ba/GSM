@@ -180,9 +180,11 @@ void ReceptionSMS(){
 	if(sms.available()){		// Avec cette boucle, s'il y a quoi que ce soit de dispo dans le buffer du modem, je le lis
 		NumeroExpediteur();		// Relevé du numéro de l'expéditeur
 		MauvaisNumero();		// En cas de mauvais numéro
-		MauvaiseInstruction();	// En cas d'instruction erronné
+		MauvaiseInstruction();	// Si le premier caractère n'est pas un chiffre entre 1 et 3, ou 9
 		// LectureSMS();		// Impression du message sur le moniteur série (pour débugger)
 		InstructionSMS();		// Actions à entreprendre en fonction des instructions
+		SortieReception:
+		SuppressionSMS();
 	}
 }
 
@@ -205,20 +207,19 @@ void MauvaisNumero(){
 	}
 }
 
-void MauvaiseInstruction(){
-	if (sms.peek() < 48 || sms.peek() > 57){					// On utilise les codes ASCII des caractères
-		Serial.print(F("Instruction erronee : "));
-		Envoi(Theme_Alerte, Text_AlerteInstruction, Text_AlerteInstructionCorrecte);
-		SuppressionSMS();
-	}
-}
-
 // void LectureSMS(){
 // 	char Texto_LPL;						// Ici, en fait il s'agit du texto "lettre par lettre" qui est affiché
 // 	while (Texto_LPL = sms.read()) {	// Lecture des bytes du message et affichage sur le moniteur série
 // 		Serial.print(Texto_LPL);
 // 	}
 // }
+
+void MauvaiseInstruction(){
+	if(sms.peek() < 48 || sms.peek() > 51){
+		Serial.print(F("Instruction erronee : "));
+		goto SortieReception;
+	}
+}
 
 void InstructionSMS(){
 	// ======= Si on a reçu un texto
@@ -228,29 +229,37 @@ void InstructionSMS(){
 	Serial.println(Choix_Action);
 
 	// ======= Instructions
-	if(Choix_Action        == 0){				// 0 : instructions utilisateurs
+	if(Choix_Action        == 9){						// 0 : instructions utilisateurs
 		Envoi(Theme_Instructions,
 			  Text_InstructionsUtilisateur,
 			  Text_Null);
-	} else if(Choix_Action == 1){				// 1 : Allumer / éteindre LED
-		SMS_LED = HIGH;							// On passe la booléenne de la LED en high
-		LEDallumageSMS(SMS_LED);
-	} else if(Choix_Action == 2){
+	} else if(Choix_Action == 1){						// 1 : Allumer / éteindre LED
+		LEDallumageSMS();
+	} else if(Choix_Action == 2){						// 2 : État de la LED
 		ControleEtatLED();
-	} else if(Choix_Action == 3){
+	} else if(Choix_Action == 3){						// 3 : Temps d'utilisation
 		TempsUtilisationArduino();
+	//else if(Choix_Action == !){} 						!! ATTENTION j'ai bloqué les chiffres au dessus dans InstructionInconnue()
+	} else {
+		InstructionInconnue();
 	}
+}
 
-	SuppressionSMS();
+void InstructionInconnue(){
+ 		Serial.print(F("Instruction inconnue : "));
+ 		Envoi(Theme_Alerte, Text_AlerteInstruction, Text_AlerteInstructionCorrecte);
 }
 
 void SuppressionSMS(){
+	int NbMessage = 0;
 	Serial.print(F("["));
 	do{
 		sms.flush();
-		Serial.print(F("."));
+		NbMessage++;
 	} while (sms.available() > 0);
-	Serial.println(F("X.]\n"));
+	Serial.print(NbMessage);
+	Serial.print(F(" message(s)"));
+	Serial.println(F(" efface(s)]\n"));
 }
 
 
@@ -275,7 +284,8 @@ void InstructionBouton(){
 	}
 }
 
-void LEDallumageSMS(bool SMS_LED){
+void LEDallumageSMS(){
+		// SMS_LED = HIGH;										// On passe la booléenne de la LED en high
 		if(LED_Etat == HIGH){
 			LED_Etat = LOW;
 			delay(100);
