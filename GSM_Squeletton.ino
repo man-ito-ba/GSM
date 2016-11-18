@@ -1,6 +1,7 @@
 // GitHub : https://github.com/man-ito-ba/projet_GSM
 /* Abbréviations
 	#MU : élément à inclure dans le Manuel Utilisateur
+	/DEBUG/ : ce que j'utilise pour débugger par le moniteur série, à effacer avant l'envoi du programme au client
 	*/
 
 // Numéro de la SIM : 0688364880
@@ -23,8 +24,10 @@ GSM_SMS sms;
 char Num_Expediteur[20];
 char Num_Administrateur[] = "+33603353147";
 
-bool SMS_LED;			// variable qui permet l'allumage / extinction de la led par texto
-bool SMS_PrecedentLED;	// variable est destiné à enregistrer l'état précédent de la LED
+bool SMS_LED;     // variable qui permet l'allumage / extinction de la led par texto
+bool SMS_PrecedentLED;  // variable est destiné à enregistrer l'état précédent de la LED
+bool SMS_Mauvaise_Instruction;
+bool SMS_Mauvais_Numero;
 
 // Gestion du temps
 const int Sec = 1000;
@@ -74,14 +77,14 @@ const int LED = 12;
 bool LED_Etat;
 
 // ======== Bouton & variables associées à son bon fonctionnement
-const int Bouton = 4;			 	// Bouton d'allumage de la LE
-bool Bouton_Etat;				 	// Booléenne enregistrant l'état du bouton par la fonction digitalRead()
-bool Bouton_EtatPrecedent;			// Booléenne enregistrant l'état précédant du bouton
-									// En l'occurence il est "HIGH" car, branché en INPUT_PULLUP, c'est ce qu'il renvoi en digitalRead
-long Bouton_Temps    = 0;			// La dernière fois que le bouton a été pressé
-long Bouton_Debounce = 200;			// Laps de temps que l'on estime nécessaire pour effectuer l'enregistrement du nouvel état du bouton (lorsqu'il est pressé). Après avec les bons composants électronique, on peut éviter les effets de rebonds du signal.
+const int Bouton = 4;       // Bouton d'allumage de la LE
+bool Bouton_Etat;         // Booléenne enregistrant l'état du bouton par la fonction digitalRead()
+bool Bouton_EtatPrecedent;      // Booléenne enregistrant l'état précédant du bouton
+					// En l'occurence il est "HIGH" car, branché en INPUT_PULLUP, c'est ce qu'il renvoi en digitalRead
+long Bouton_Temps    = 0;     // La dernière fois que le bouton a été pressé
+long Bouton_Debounce = 200;     // Laps de temps que l'on estime nécessaire pour effectuer l'enregistrement du nouvel état du bouton (lorsqu'il est pressé). Après avec les bons composants électronique, on peut éviter les effets de rebonds du signal.
 
-int Potentiometre;					// Variable servant à compter (simu à voir plus bas)
+int Potentiometre;          // Variable servant à compter (simu à voir plus bas)
 
 
 // ****************************************************************************
@@ -97,23 +100,25 @@ void setup()
 	Bouton_EtatPrecedent,
 	LED_Etat,
 	MillisActuel,
-	MillisInterval
+	MillisInterval,
+	SMS_Mauvais_Numero,
+	SMS_Mauvaise_Instruction
 	= 0;
 
 	// ======= Initialisation matériel
 	pinMode(Bouton, INPUT_PULLUP);
 
 	pinMode(LED, OUTPUT);
-	digitalWrite(LED, HIGH);									// La LED est ON, marquant le début du setup()
+	digitalWrite(LED, HIGH);                  // La LED est ON, marquant le début du setup()
 	
 	// ======= Initialisation moniteur série
 	Serial.begin(9600);
-	while (!Serial) {
-		; 														// On attend que le port Serial se connecte, ce qui est surtout indispensable seulement pour le port USB natif
+		while (!Serial) {
+		;                             // On attend que le port Serial se connecte, ce qui est surtout indispensable seulement pour le port USB natif
 	}
 
 	// ======= Connection au réseau
-	ConnectionReseau();										// Fonction de connection au réseau
+	ConnectionReseau();                   // Fonction de connection au réseau
 
 	delay(1000);
 
@@ -122,11 +127,11 @@ void setup()
 	Serial.println(F("** Programme SMS in/out **"));
 	Serial.println(F("**************************"));
 
-	digitalWrite(LED, LOW);										// la led s'éteint et marque la fin du setup()
+	digitalWrite(LED, LOW);                   // la led s'éteint et marque la fin du setup()
 
-	Envoi(Theme_MiseEnMarche, Text_MiseEnMarche, Text_Null);	// On envoi un texto au client une fois le système activé.
+	Envoi(Theme_MiseEnMarche, Text_MiseEnMarche, Text_Null);  // On envoi un texto au client une fois le système activé.
 	
-	SuppressionSMS();											// Au démarrage, les textos en attente dans le modem sont toujours effacés pour éviter les conflits. #MU
+	SuppressionSMS();                     // Au démarrage, les textos en attente dans le modem sont toujours effacés pour éviter les conflits. #MU
 }
 
 
@@ -138,13 +143,13 @@ void loop()
 {
 	// Millis() ? Pour checker seulement toutes les 10 min ? :(
 
-	ReceptionSMS();				// Instructions données par SMS
+	ReceptionSMS();       // Instructions données par SMS
 
-	InstructionBouton();		// Instructions données par le bouton physique
+	InstructionBouton();    // Instructions données par le bouton physique
 	
-	AllumageExtinctionLED();	// Action sur la LED
+	AllumageExtinctionLED();  // Action sur la LED
 
-	delay(10);					// Délai nécessaire pour que le programme tourne sans souci
+	delay(10);          // Délai nécessaire pour que le programme tourne sans souci
 }
 
 // ****************************************************************************
@@ -153,22 +158,22 @@ void loop()
 
 
 // void VerificationPlantage(void) {
-	// wdt_enable(WDTO_1S);		// Fonction de reset : trop courte car reboot après 1 seconde. Or, il arrive pour des raisons valides que le programme ne repasse pas par cette boucle à temps...
+	// wdt_enable(WDTO_1S);   // Fonction de reset : trop courte car reboot après 1 seconde. Or, il arrive pour des raisons valides que le programme ne repasse pas par cette boucle à temps...
 	// for(;;);
 // }
 
 void ConnectionReseau(){
-	bool PasDeConnection = true;						// Bool d'état de la connection
-	while (PasDeConnection) {							// Démarrage du shield GSM
-		Serial.println(F("[Recherche reseau]"));
-		delay(500);										// Est-ce que je peux pas allonger pour laisser du temps en modem ?
-		if (gsmAccess.begin(CodePIN) == GSM_READY) {	// Si la SIM a un code PIN, le passer en tant que paramètre de begin(), entre guillemets
-			delay(500);
-			PasDeConnection = false;
-		} else {
-			Serial.println(F("[Pas de connection]"));
-			delay(1000);
-		}
+	bool PasDeConnection = true;            // Bool d'état de la connection
+	while (PasDeConnection) {             // Démarrage du shield GSM
+	Serial.println(F("[Recherche reseau]"));
+	delay(500);                   // Est-ce que je peux pas allonger pour laisser du temps en modem ?
+	if (gsmAccess.begin(CodePIN) == GSM_READY) {  // Si la SIM a un code PIN, le passer en tant que paramètre de begin(), entre guillemets
+		delay(500);
+		PasDeConnection = false;
+	} else {
+		Serial.println(F("[Pas de connection]"));
+		delay(1000);
+	}
 	}
 }
 
@@ -177,77 +182,97 @@ void ConnectionReseau(){
 // ****************************************************************************
 
 void ReceptionSMS(){
-	if(sms.available()){		// Avec cette boucle, s'il y a quoi que ce soit de dispo dans le buffer du modem, je le lis
-		NumeroExpediteur();		// Relevé du numéro de l'expéditeur
-		MauvaisNumero();		// En cas de mauvais numéro
-		MauvaiseInstruction();	// Si le premier caractère n'est pas un chiffre entre 1 et 3, ou 9
-		// LectureSMS();		// Impression du message sur le moniteur série (pour débugger)
-		InstructionSMS();		// Actions à entreprendre en fonction des instructions
-		SortieReception:
+	if(sms.available()){    // Avec cette boucle, s'il y a quoi que ce soit de dispo dans le buffer du modem, je le lis
+		NumeroExpediteur();   // Relevé du numéro de l'expéditeur
+		MauvaisNumero();    // En cas de mauvais numéro
+		/*DEBUG*/ Serial.print(F("** Variable 'SMS_Mauvais_Numero' = "));
+		/*DEBUG*/ Serial.println(SMS_Mauvais_Numero);
+		// InstructionsSerialPrint();	// J'affiche le message reçu sur mon moniteur série (ça me permet de contrôler ce que fait la suite du programme, en sachant ce qu'il a reçu)
+		MauvaiseInstruction();  // Si le premier caractère n'est pas un chiffre entre 1 et 3, ou 9
+		/*DEBUG*/ Serial.print(F("** Variable 'SMS_Mauvaise_Instruction' = "));
+		/*DEBUG*/ Serial.println(SMS_Mauvaise_Instruction);
+		InstructionSMS();   // Actions à entreprendre en fonction des instructions
 		SuppressionSMS();
 	}
 }
 
 void NumeroExpediteur(){
 	Serial.print(F("\n[SMS recu du "));
-	sms.remoteNumber(Num_Expediteur, 20);	// On stock le numéro de l'expéditeur (il y a de grandes chances que ce soit le numéro de l'utilisateur préenregistré)
+	sms.remoteNumber(Num_Expediteur, 20); // On stock le numéro de l'expéditeur (il y a de grandes chances que ce soit le numéro de l'utilisateur préenregistré)
 	Serial.print(Num_Expediteur);
 	Serial.println(F("]"));
 }
 
 void MauvaisNumero(){
-	for(int i = 0; i < 12; i++){											// La boucle va en 12 parce que le numéro est composé de douze chiffres (avec le "+33" et sans le premier "0")
-	    if(Num_Expediteur[i] == Num_Administrateur[i]);
-		else{
-			Serial.println(F("Numero pas compatible..."));					// Si un chiffre diffère, on efface le message, empêchant l'instruction d'être effectuée
-			Envoi(Theme_Alerte, Text_AlerteIntrusion, Num_Expediteur);	// et on prévient l'utilisateur de l'intrusion
-			SuppressionSMS();
-			return;															// Une fois le faux numéro détecté, on sort de for() pour éviter d'envoyer inutilement les alertes d'intrusion, et on retourne à la boucle précédente
-	    }
+	for(int i = 0; i < 12; i++){									// La boucle va en 12 parce que le numéro est composé de douze chiffres (avec le "+33" et sans le premier "0")
+	if(Num_Expediteur[i] == Num_Administrateur[i]);
+	else{
+		/*DEBUG*/ Serial.println(F("Numero pas compatible..."));	// Si un chiffre diffère, on efface le message, empêchant l'instruction d'être effectuée
+		Envoi(Theme_Alerte, Text_AlerteIntrusion, Num_Expediteur);	// et on prévient l'utilisateur de l'intrusion
+		SMS_Mauvais_Numero = true;
+		return;														// Une fois le faux numéro détecté, on sort de for() pour éviter d'envoyer inutilement les alertes d'intrusion, et on retourne à la boucle précédente
+		}
 	}
 }
 
-// void LectureSMS(){
-// 	char Texto_LPL;						// Ici, en fait il s'agit du texto "lettre par lettre" qui est affiché
-// 	while (Texto_LPL = sms.read()) {	// Lecture des bytes du message et affichage sur le moniteur série
-// 		Serial.print(Texto_LPL);
-// 	}
-// }
+void InstructionsSerialPrint(){
+	char Texto_LPL;												// Ici, en fait il s'agit du texto "lettre par lettre" qui est affiché
+	// ======= Lecture des bytes du message et affichage sur le moniteur série
+	while (Texto_LPL = sms.read()) {
+		Serial.print(Texto_LPL);
+	}
+	/*DEBUG*/ Serial.println("");
+	/*DEBUG*/ Serial.println("(** tel que lu dans le texto)");
+}
 
 void MauvaiseInstruction(){
 	if(sms.peek() < 48 || sms.peek() > 51){
-		Serial.print(F("Instruction erronee : "));
-		goto SortieReception;
+		/*DEBUG*/ Serial.println(F("** Instruction erronee : "));
+		/*DEBUG*/ Serial.println(SMS_Mauvaise_Instruction);
+		SMS_Mauvaise_Instruction = true;
+	}
+	else{
+		SMS_Mauvaise_Instruction = false;
 	}
 }
 
 void InstructionSMS(){
 	// ======= Si on a reçu un texto
-	// if(sms.available()){									// Avec cette boucle, s'il y a quoi que ce soit de dispo dans le buffer du modem, je le lis
+	// if(sms.available()){                 // Avec cette boucle, s'il y a quoi que ce soit de dispo dans le buffer du modem, je le lis
+	
+	// ======= Vérification
+	// if(SMS_Mauvais_Numero = true){						// Si le message provient d'un utilisateur non-enregistré
+	// 	SMS_Mauvais_Numero = false;
+	// 	Serial.println(F("...donc on coupe la fonction InstructionSMS()"));
+	// 	return;											// On empêche de continuer dans cette fonction et on retourne à ReceptionSMS()
+	// }
+
 	// ======= Lecture du choix de l'expéditeur
-	int Choix_Action = sms.parseInt();					// on cherche un entier ("Int")
+	/*DEBUG*/ Serial.println(F("** Lecture parseInt()"));
+	int Choix_Action = sms.parseInt();          // on cherche un entier ("Int")
+	/*DEBUG*/ Serial.print(F("** variable 'Choix_Action' : "));
 	Serial.println(Choix_Action);
 
 	// ======= Instructions
-	if(Choix_Action        == 9){						// 0 : instructions utilisateurs
+	if(Choix_Action        == 9){           // 0 : instructions utilisateurs
 		Envoi(Theme_Instructions,
-			  Text_InstructionsUtilisateur,
-			  Text_Null);
-	} else if(Choix_Action == 1){						// 1 : Allumer / éteindre LED
+		Text_InstructionsUtilisateur,
+		Text_Null);
+	} else if(Choix_Action == 1){           // 1 : Allumer / éteindre LED
 		LEDallumageSMS();
-	} else if(Choix_Action == 2){						// 2 : État de la LED
+	} else if(Choix_Action == 2){           // 2 : État de la LED
 		ControleEtatLED();
-	} else if(Choix_Action == 3){						// 3 : Temps d'utilisation
+	} else if(Choix_Action == 3){           // 3 : Temps d'utilisation
 		TempsUtilisationArduino();
-	//else if(Choix_Action == !){} 						!! ATTENTION j'ai bloqué les chiffres au dessus dans InstructionInconnue()
+	//else if(Choix_Action == !){}            !! ATTENTION j'ai bloqué les chiffres au dessus dans InstructionInconnue()
 	} else {
 		InstructionInconnue();
 	}
 }
 
 void InstructionInconnue(){
- 		Serial.print(F("Instruction inconnue : "));
- 		Envoi(Theme_Alerte, Text_AlerteInstruction, Text_AlerteInstructionCorrecte);
+	Serial.print(F("Instruction inconnue : "));
+	Envoi(Theme_Alerte, Text_AlerteInstruction, Text_AlerteInstructionCorrecte);
 }
 
 void SuppressionSMS(){
@@ -268,16 +293,16 @@ void SuppressionSMS(){
 // ****************************************************************************
 
 void InstructionBouton(){
-	Bouton_Etat = digitalRead(Bouton);			// Cette fonction permet à un bouton d'allumer la LED
+	Bouton_Etat = digitalRead(Bouton);      // Cette fonction permet à un bouton d'allumer la LED
 
-	if(Bouton_Etat == LOW && Bouton_EtatPrecedent == HIGH && millis() - Bouton_Temps > Bouton_Debounce){	// Si on appuie sur le bouton, et que son état précédent était "pas appuyé", et qu'on ai laissé suffisamment de temps
-		if(LED_Etat == HIGH){		 			// et que la LED est déjà allumée
-			LED_Etat = LOW;			 			// on passe l'état (et non pas a led) à "éteint"
+	if(Bouton_Etat == LOW && Bouton_EtatPrecedent == HIGH && millis() - Bouton_Temps > Bouton_Debounce){  // Si on appuie sur le bouton, et que son état précédent était "pas appuyé", et qu'on ai laissé suffisamment de temps
+		if(LED_Etat == HIGH){         // et que la LED est déjà allumée
+			LED_Etat = LOW;           // on passe l'état (et non pas a led) à "éteint"
 			delay(100);
 			Envoi(Theme_LED, Text_BoutonLED, Text_LEDOff);
 		}
 		else {
-			LED_Etat = HIGH;					// et vice-versa
+			LED_Etat = HIGH;          // et vice-versa
 			delay(100);
 			Envoi(Theme_LED, Text_BoutonLED, Text_LEDOn);
 		}
@@ -285,32 +310,33 @@ void InstructionBouton(){
 }
 
 void LEDallumageSMS(){
-		// SMS_LED = HIGH;										// On passe la booléenne de la LED en high
-		if(LED_Etat == HIGH){
-			LED_Etat = LOW;
-			delay(100);
-		    Envoi(Theme_LED, Text_SmsLED, Text_LEDOff);
-		}
-		else {
-			LED_Etat = HIGH;
-			delay(100);
-			Envoi(Theme_LED, Text_SmsLED, Text_LEDOn);
-		}
+	// SMS_LED = HIGH;                    // On passe la booléenne de la LED en high
+	if(LED_Etat == HIGH){
+		LED_Etat = LOW;
+		delay(100);
+		Envoi(Theme_LED, Text_SmsLED, Text_LEDOff);
+	}
+	else {
+		LED_Etat = HIGH;
+		delay(100);
+		Envoi(Theme_LED, Text_SmsLED, Text_LEDOn);
+	}
 }
 
 void AllumageExtinctionLED(){
-	digitalWrite(LED, LED_Etat);				// On attribue à la LED a valeur de État_led
-	Bouton_EtatPrecedent = Bouton_Etat; 		// sans oublier d'enregistrer l'état du bouton
+	/*DEBUG*/ Serial.println(F("** Allumage effectif des LED"));
+	digitalWrite(LED, LED_Etat);        // On attribue à la LED a valeur de État_led
+	Bouton_EtatPrecedent = Bouton_Etat;     // sans oublier d'enregistrer l'état du bouton
 }
 
 void ControleEtatLED(){
-	switch (LED_Etat) {									// Cette fonction sert à indiquer à l'utilisateur l'état actuel de la LED
-	    case 0:
-	      Envoi(Theme_LED, Text_EtatLED, Text_LEDOff);
-	      break;
-	    case 1:
-	      Envoi(Theme_LED, Text_EtatLED, Text_LEDOn);
-	      break;
+	switch (LED_Etat) {                 // Cette fonction sert à indiquer à l'utilisateur l'état actuel de la LED
+		case 0:
+		Envoi(Theme_LED, Text_EtatLED, Text_LEDOff);
+		break;
+		case 1:
+		Envoi(Theme_LED, Text_EtatLED, Text_LEDOn);
+		break;
 	}
 }
 
@@ -321,18 +347,18 @@ void ControleEtatLED(){
 
 void TempsUtilisationArduino(){
 	char *Temps_Utilisation;
-	Temps_Utilisation = TempsVersString(millis()/1000);							// Je suis obligé de convertir millis en un String, et on me renverra un tableau char d'ailleurs, pour pouvoir l'envoyer par texto ensuite
+	Temps_Utilisation = TempsVersString(millis()/1000);             // Je suis obligé de convertir millis en un String, et on me renverra un tableau char d'ailleurs, pour pouvoir l'envoyer par texto ensuite
 	Serial.println(Temps_Utilisation);
 	Envoi(Theme_TempsUtilisation, Temps_Utilisation, Temps_UtilisationUnite);
 }
 
-char * TempsVersString(unsigned long TempsEnSecondes){			// TempsEnSecondes est le temps en secondes issu du calcul "millis()/1000" dans la boucle précédente
+char * TempsVersString(unsigned long TempsEnSecondes){      // TempsEnSecondes est le temps en secondes issu du calcul "millis()/1000" dans la boucle précédente
 	static char Temps_Total[12];
-	long Heu 		= TempsEnSecondes / 3600;
+	long Heu    = TempsEnSecondes / 3600;
 	TempsEnSecondes = TempsEnSecondes % 3600;
-	int Min 		= TempsEnSecondes / 60;
-	int Sec 		= TempsEnSecondes % 60;
-	sprintf(Temps_Total, "%02ldh%02dmin%02ds", Heu, Min, Sec);	// c'est en changeant les chiffres après chaque "%0" qu'on définit le nb de zéros
+	int Min     = TempsEnSecondes / 60;
+	int Sec     = TempsEnSecondes % 60;
+	sprintf(Temps_Total, "%02ldh%02dmin%02ds", Heu, Min, Sec);  // c'est en changeant les chiffres après chaque "%0" qu'on définit le nb de zéros
 	return Temps_Total;
 }
 
@@ -345,12 +371,18 @@ void Envoi(char Theme[], char Message1[], char Message2[]){
 	Serial.print(Message1);
 	Serial.println(Message2);
 
+	/*DEBUG*/ Serial.println(F("** beginSMS"));
 	sms.beginSMS(Num_Administrateur);
+	/*DEBUG*/ Serial.println(F("** SystemeID"));
 	sms.print(SystemeID);
+	/*DEBUG*/ Serial.println(F("** Theme"));
 	sms.print(Theme);
+	/*DEBUG*/ Serial.println(F("** Message1"));
 	sms.print(Message1);
+	/*DEBUG*/ Serial.println(F("** Message2"));
 	sms.print(Message2);
 
+	/*DEBUG*/ Serial.println(F("** endSMS"));
 	sms.endSMS();
 	Serial.println(F("...fin du message]"));
 }
